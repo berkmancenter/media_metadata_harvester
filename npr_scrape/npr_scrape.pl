@@ -335,6 +335,7 @@ sub main
     my $living_authors;
 
     _youtube_lookup('http://api.npr.org/query?id=1034,1033&apiKey=MDAzNzI2MDAxMDEyNDczMjQ5OTUwODhmZA001');
+    _youtube_lookup('http://api.npr.org/query?id=13&apiKey=MDAzNzI2MDAxMDEyNDczMjQ5OTUwODhmZA001');
 
     #look_up_at_google_talks(' ' );
     #look_up_ted_talk_author();

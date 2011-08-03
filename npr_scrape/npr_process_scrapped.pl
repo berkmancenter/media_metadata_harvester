@@ -50,60 +50,69 @@ sub get_hash_from_string
     my $story = $dom->documentElement();
     my $xc    = XML::LibXML::XPathContext->new( $story );
 
-    my $ret = _get_element_values_as_hash(
-        $xc,
-        [
-            qw (
-              title
-              subtitle
-              shortTitle
-              teaser
-              miniTeaser
-              slug
-              thumbnail.medium
-              thumbnail.large
-              thumbnail.provider
-              toenail
-              toenail.medium
-              storyDate
-              pubDate
-              lastModifiedDate
-              keywords
-              priorityKeywords
-              byline.name
-              #<organization orgAbbr="NPR" orgId="1">
-              organization.name
-              organization.website
-              audio.duration
-              audio.description
-              audio.format.mp3
-              audio.format.rm
-              audio.format.wm
-              #image
-              #image.caption
-              #image.link
-              #image.producer
-              #image.provider
-              #image.copyright
-              #relatedLink
-              #relatedLink.caption
-              #relatedLink.link
-              #pullQuote
-              #pullQuote.person
-              #pullQuote.date
-              #text
-              #text.paragraph
-              #textWithHtml
-              #textWithHtml.paragraph
-              #listText
-              #listText.item
-              #correction
-              correction.correctionTitle
-              correction.correctionText
-              correction.correctionDate
-              )
-        ]
-    );
+
+    ## TODO preserve paragraph elements of text and textWithHtml elements.
+
+    my $hash_elements = [
+        qw (
+          title
+          subtitle
+          shortTitle
+          teaser
+          miniTeaser
+          slug
+          thumbnail.medium
+          thumbnail.large
+          thumbnail.provider
+          toenail
+          toenail.medium
+          storyDate
+          pubDate
+          lastModifiedDate
+          keywords
+          priorityKeywords
+          byline.name
+          organization.name
+          organization.website
+          audio.duration
+          audio.description
+          audio.format.mp3
+          audio.format.rm
+          audio.format.wm
+          correction.correctionTitle
+          correction.correctionText
+          correction.correctionDate
+	  text
+          )
+    ];
+
+    #<organization orgAbbr="NPR" orgId="1">
+    #image
+    #image.caption
+    #image.link
+    #image.producer
+    #image.provider
+    #image.copyright
+    #relatedLink
+    #relatedLink.caption
+    #relatedLink.link
+    #pullQuote
+    #pullQuote.person
+    #pullQuote.date
+    #text
+    #text.paragraph
+    #textWithHtml
+    #textWithHtml.paragraph
+    #listText
+    #listText.item
+    #correction
+
+    say Dumper( $hash_elements );
+    $hash_elements = [ map { $_ =~ s/\./\//g; $_ } @$hash_elements ];
+
+    say Dumper( $hash_elements );
+
+    my $ret = _get_element_values_as_hash( $xc, $hash_elements );
 
     my $id = $story->getAttribute( 'id' );
 
@@ -223,11 +232,17 @@ sub main
 
         #say STDERR Dumper( $hash );
 
-        #map { say "$_ text ," } sort (keys %{ $hash });
+        map { say "$_ text ," } sort (keys %{ $hash });
 
         #exit;
 
+	$dbh->query( ' DELETE from npr_items_processed where id = ? ', $hash->{id} );
+
         $dbh->insert( 'npr_items_processed', $hash );
+
+	say "INSERTED";
+
+	exit;
     }
 
 }

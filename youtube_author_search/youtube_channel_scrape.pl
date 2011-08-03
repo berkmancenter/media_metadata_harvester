@@ -97,8 +97,6 @@ sub _get_data_hash_from_youtube_video_entry
 
     #say "starting: _get_data_hash_from_youtube_video_entry";
 
-
-
     #say Dumper( $entry );
 
     my $xc = XML::LibXML::XPathContext->new( $entry );
