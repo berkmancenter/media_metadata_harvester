@@ -49,7 +49,7 @@ sub get_hash_from_string
     my $story =  $dom->documentElement();
     my $xc = XML::LibXML::XPathContext->new( $story );
 
-    my $ret = _get_element_values_as_hash( $xc, [ qw ( title subtitle shortTitle teaser miniTeaser slug storyDate pubDate lastModifiedDate keywords priorityKeywords ) ] );
+    my $ret = _get_element_values_as_hash( $xc, [ qw ( title subtitle shortTitle teaser miniTeaser slug storyDate pubDate lastModifiedDate keywords priorityKeywords organization/name organization/website ) ] );
 
     my $id = $story->getAttribute( 'id' );
 
@@ -84,6 +84,7 @@ sub _get_element_values_as_hash
        my $query = ".//$element_name";
        my $value = _get_text_value_of_xpath_query ( $xc, $query );
 
+       $element_name =~ s/\//_/g;
        $ret->{ $element_name } = $value;
    }
 
@@ -134,6 +135,8 @@ sub main
 	#say STDERR Dumper( $hash );
 
 	#map { say "$_ text ," } sort (keys %{ $hash });
+
+	#exit;
 
         $dbh->insert( 'npr_items_processed', $hash );
     }
