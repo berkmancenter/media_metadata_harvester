@@ -237,27 +237,6 @@ sub look_up_ted_talk_author
     return look_up_youtube_author_talk( $author, 'TEDtalksDirector' );
 }
 
-sub look_up_berkman
-{
-    my ( $author ) = @_;
-
-    return look_up_youtube_author_talk( $author, 'BerkmanCenter' );
-}
-
-sub look_up_BookTV
-{
-    my ( $author ) = @_;
-
-    return look_up_youtube_author_talk( $author, 'BookTV' );
-}
-
-sub look_up_at_google_talks
-{
-    my ( $author ) = @_;
-
-    return look_up_youtube_author_talk( $author, 'AtGoogleTalks' );
-}
-
 sub get_book_db_record
 {
     my ( $title, $author ) = @_;
