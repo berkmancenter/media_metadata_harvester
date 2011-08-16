@@ -238,45 +238,6 @@ sub get_book_db_record
     return $results->hash;
 }
 
-sub store_book_videos
-{
-    my ( $book_rec, $video_entries ) = @_;
-
-    say STDERR "store_book_videos";
-
-    foreach my $video_entry ( @$video_entries )
-    {
-
-        say STDERR "Processing video entry ";
-        my $hash = _get_data_hash_from_youtube_video_entry( $video_entry );
-
-        #say Dumper ( $hash );
-
-        _get_video_record( $hash );
-    }
-}
-
-sub look_up_book_videos
-{
-    my ( $title, $author ) = @_;
-
-    say STDERR "look_up_book_videos";
-
-    #exit;
-    my $book_rec = get_book_db_record( $title, $author );
-
-    my $videos = look_up_ted_talk_author( $author );
-
-    say STDERR "Videos storage ";
-    store_book_videos( $book_rec, $videos );
-
-    say STDERR "Done video storage ";
-
-    say STDERR "exiting look_up_book_videos";
-
-    exit;
-}
-
 sub main
 {
     my $key = $ARGV[ 0 ];
