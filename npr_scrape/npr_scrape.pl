@@ -27,23 +27,6 @@ use 5.10.0;
 use strict;
 use warnings;
 
-sub look_up_youtube_author_talk
-{
-    my ( $author, $channel ) = @_;
-
-    my $base_url = "http://gdata.youtube.com/feeds/api/users/$channel/uploads";
-
-    return _youtube_lookup( $base_url );
-}
-
-sub look_up_youtube_global
-{
-    my ( $author ) = @_;
-
-    my $youtube_global_search_api = 'https://gdata.youtube.com/feeds/api/videos';
-    return _youtube_lookup( $author, $youtube_global_search_api );
-}
-
 my $channel_author_counts = {};
 
 sub _get_text_value_of_xpath_query
@@ -228,13 +211,6 @@ sub _youtube_lookup
     }
 
     return;
-}
-
-sub look_up_ted_talk_author
-{
-    my ( $author ) = @_;
-
-    return look_up_youtube_author_talk( $author, 'TEDtalksDirector' );
 }
 
 sub get_book_db_record
