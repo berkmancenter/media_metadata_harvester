@@ -119,7 +119,7 @@ sub _get_db
     return $dbh;
 }
 
-sub _store_video_in_db
+sub _store_item_in_db
 {
     my ( $hash ) = @_;
 
@@ -129,32 +129,32 @@ sub _store_video_in_db
     $dbh->insert( 'npr_items_raw', $hash );
 }
 
-sub _get_video_record
+sub _get_item_db_record
 {
     my ( $hash ) = @_;
 
     my $dbh = _get_db();
 
-    #say "_get_video_record: id: " . $hash->{ id };
+    #say "_get_item_db_record: id: " . $hash->{ id };
 
     my $ret = $dbh->query( 'select * from npr_items_raw where id = ? ', $hash->{ id } )->hash;
 
     if ( !$ret )
     {
-        _store_video_in_db( $hash );
+        _store_item_in_db( $hash );
 	$ret = $dbh->query( 'select * from npr_items_raw where id = ? ', $hash->{ id } )->hash;
 	die unless $ret;
     }
 
-    #say "done _get_video_record: id: " . $hash->{ id };
+    #say "done _get_item_db_record: id: " . $hash->{ id };
     return $ret;
 }
 
-sub _youtube_lookup
+sub npr_api_url
 {
     my ( $base_url ) = @_;
 
-    say "_youtube_lookup '$base_url'";
+    say "npr_api_url '$base_url'";
 
     confess unless $base_url;
 
@@ -162,7 +162,6 @@ sub _youtube_lookup
 
     # Create a request
     my $req = HTTP::Request->new( GET => $uri );
-
 
     # max size
 
@@ -173,7 +172,6 @@ sub _youtube_lookup
     my $num_results;
 
     {
-
         say "Requesting'$base_url' : start_index: $start_index max-results: $max_results";
 
         # Create a request
@@ -206,7 +204,7 @@ sub _youtube_lookup
 
             #say Dumper ( $hash );
 
-            _get_video_record( $hash );
+            _get_item_db_record( $hash );
         }
 
     }
@@ -218,22 +216,8 @@ sub main
 {
     my $key = $ARGV[ 0 ];
 
-    my $lines = 0;
-
-    my $authors_found     = 0;
-    my $authors_not_found = 0;
-
-    my $dead_authors = 0;
-    my $living_authors;
-
-    _youtube_lookup('http://api.npr.org/query?id=1034,1033&apiKey=MDAzNzI2MDAxMDEyNDczMjQ5OTUwODhmZA001');
-    _youtube_lookup('http://api.npr.org/query?id=13&apiKey=MDAzNzI2MDAxMDEyNDczMjQ5OTUwODhmZA001');
-
-    #look_up_at_google_talks(' ' );
-    #look_up_ted_talk_author();
-    #look_up_berkman();
-
-    #look_up_BookTV();
+    npr_api_url('http://api.npr.org/query?id=1034,1033&apiKey=MDAzNzI2MDAxMDEyNDczMjQ5OTUwODhmZA001');
+    npr_api_url('http://api.npr.org/query?id=13&apiKey=MDAzNzI2MDAxMDEyNDczMjQ5OTUwODhmZA001');
 }
 
 main();
