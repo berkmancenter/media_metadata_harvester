@@ -26,6 +26,7 @@ use 5.10.0;
 
 use strict;
 use warnings;
+use warnings::unused;
 
 my $channel_author_counts = {};
 
@@ -211,31 +212,6 @@ sub _youtube_lookup
     }
 
     return;
-}
-
-sub get_book_db_record
-{
-    my ( $title, $author ) = @_;
-
-    my $dbh = _get_db();
-
-    my $results = $dbh->query( " SELECT * from books where author = ? and title = ?  limit 1", $author, $title );
-
-    #say Dumper ( $results );
-
-    my $ret = $results->hashes;
-
-    #say Dumper( $ret );
-
-    #say Dumper( scalar( @$ret ) );
-
-    if ( !scalar( @$ret ) )
-    {
-        $dbh->query( "INSERT INTO books (author, title) VALUES (?, ? ) ", $author, $title );
-        $results = $dbh->query( " SELECT * from books where author = ? and title = ?  limit 1", $author, $title );
-    }
-
-    return $results->hash;
 }
 
 sub main
