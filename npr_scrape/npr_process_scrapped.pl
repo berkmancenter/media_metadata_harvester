@@ -107,10 +107,10 @@ sub get_hash_from_string
     #listText.item
     #correction
 
-    say Dumper( $hash_elements );
+    #say Dumper( $hash_elements );
     $hash_elements = [ map { $_ =~ s/\./\//g; $_ } @$hash_elements ];
 
-    say Dumper( $hash_elements );
+    #say Dumper( $hash_elements );
 
     my $ret = _get_element_values_as_hash( $xc, $hash_elements );
 
@@ -214,6 +214,9 @@ sub main
 
     my $npr_stories_xml = $dbh->query( " select * from npr_items_raw " )->hashes();
 
+    my $stories_processed = 0;
+    my $total_stories   = scalar ( @$npr_stories_xml );
+
     foreach my $npr_story_xml ( @$npr_stories_xml )
     {
 
@@ -232,7 +235,7 @@ sub main
 
         #say STDERR Dumper( $hash );
 
-        map { say "$_ text ," } sort (keys %{ $hash });
+        #map { say "$_ text ," } sort (keys %{ $hash });
 
         #exit;
 
@@ -242,7 +245,11 @@ sub main
 
 	say "INSERTED";
 
-	exit;
+	$stories_processed++;
+
+	say "Processed $stories_processed out of $total_stories";
+
+	#exit;
     }
 
 }
