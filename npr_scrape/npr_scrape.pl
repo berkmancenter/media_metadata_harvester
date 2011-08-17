@@ -6,6 +6,7 @@ use Encode;
 use LWP::UserAgent;
 use XML::LibXML;
 use Carp;
+
 #use XML::LibXML::Enhanced;
 
 use DBIx::Simple;
@@ -44,12 +45,12 @@ sub _get_data_hash_from_item_entry
 
     #say Dumper($entry->toHash( 1) );
 
-    my $id =  $entry->getAttribute( 'id' );
+    my $id = $entry->getAttribute( 'id' );
 
     my $full_string = $entry->toStringC14N();
 
     my $ret = {
-        id          => $id,
+        id              => $id,
         full_xml_string => $full_string,
     };
 
@@ -96,8 +97,8 @@ sub _get_item_db_record
     if ( !$ret )
     {
         _store_item_in_db( $hash );
-	$ret = $dbh->query( 'select * from npr_items_raw where id = ? ', $hash->{ id } )->hash;
-	die unless $ret;
+        $ret = $dbh->query( 'select * from npr_items_raw where id = ? ', $hash->{ id } )->hash;
+        die unless $ret;
     }
 
     #say "done _get_item_db_record: id: " . $hash->{ id };
@@ -150,16 +151,16 @@ sub npr_api_url
 
         my @entries = $xc->findnodes( '//list/story' );
 
-	#say Dumper([@entries]);
+        #say Dumper([@entries]);
 
-	my $num_stories = scalar ( @entries );
+        my $num_stories = scalar( @entries );
 
-	say STDERR "Got $num_stories stories";
+        say STDERR "Got $num_stories stories";
 
-	if ( $num_stories == 0 )
-	{
-	   last;
-	}
+        if ( $num_stories == 0 )
+        {
+            last;
+        }
 
         foreach my $entry ( @entries )
         {
@@ -171,7 +172,7 @@ sub npr_api_url
             _get_item_db_record( $hash );
         }
 
-	$start_index += $numResults;
+        $start_index += $numResults;
     }
 
     return;
@@ -181,7 +182,7 @@ sub _get_npr_api_url
 {
     my ( $id, $api_key ) = @_;
 
-    npr_api_url("http://api.npr.org/query?id=$id&apiKey=$api_key");
+    npr_api_url( "http://api.npr.org/query?id=$id&apiKey=$api_key" );
 
     return;
 }
@@ -191,7 +192,7 @@ sub main
     Readonly my $api_key => "MDAzNzI2MDAxMDEyNDczMjQ5OTUwODhmZA001";
 
     _get_npr_api_url( 1034, $api_key );
-    _get_npr_api_url( 13, $api_key );
+    _get_npr_api_url( 13,   $api_key );
 }
 
 main();
