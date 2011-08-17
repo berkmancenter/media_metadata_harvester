@@ -187,12 +187,39 @@ sub _get_npr_api_url
     return;
 }
 
+my $npr_ids_to_scrap = [
+
+    #topics
+    '1034',    # (1) Book Reviews
+    '1032',    # (2) Books
+    '1033',    # (3) Author Interviews
+    '1022',    # (4) Interviews
+    '1085',    # (5) Summer Reading: Fiction
+    '1089',    # (6) Summer Reading: Nonfiction
+    '1086',    # (7) Summer Reading: Kids
+
+    # programs
+    '13',      # (1) Fresh Air
+    '5',       # (2) Talk of the Nation
+    '2',       # (3) All Things Considered
+
+    #series
+    '13795507',     # (1) Crime in the City
+    '14019811',     # (2) Most Influential Black Authors
+    '105197262',    # (3) Observing China At 60: Three Authors
+    '10448909',     # (4) Book Tour
+    '91752774',     # (5) Books We Like
+    '4732640',      # (6) Fully Authorized
+];
+
 sub main
 {
     Readonly my $api_key => "MDAzNzI2MDAxMDEyNDczMjQ5OTUwODhmZA001";
 
-    _get_npr_api_url( 1034, $api_key );
-    _get_npr_api_url( 13,   $api_key );
+    foreach my $npr_id ( @{ $npr_ids_to_scrap } )
+    {
+        _get_npr_api_url( $npr_id, $api_key );
+    }
 }
 
 main();
