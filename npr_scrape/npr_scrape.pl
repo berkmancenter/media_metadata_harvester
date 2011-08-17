@@ -127,11 +127,6 @@ sub npr_api_url
 
         my $uri = URI->new( $req_url );
 
-	# Create a request
-	my $req = HTTP::Request->new( GET => $uri );
-
-
-
         say STDERR "Requesting'$req_url' : start_index: $start_index max-results: $numResults";
 
         # Create a request
@@ -182,12 +177,21 @@ sub npr_api_url
     return;
 }
 
+sub _get_npr_api_url
+{
+    my ( $id, $api_key ) = @_;
+
+    npr_api_url("http://api.npr.org/query?id=$id&apiKey=$api_key");
+
+    return;
+}
+
 sub main
 {
     Readonly my $api_key => "MDAzNzI2MDAxMDEyNDczMjQ5OTUwODhmZA001";
 
-    npr_api_url("http://api.npr.org/query?id=1034&apiKey=$api_key");
-    npr_api_url("http://api.npr.org/query?id=13&apiKey=$api_key");
+    _get_npr_api_url( 1034, $api_key );
+    _get_npr_api_url( 13, $api_key );
 }
 
 main();
