@@ -265,11 +265,7 @@ sub _youtube_lookup
 
 	   next;
 
-	   my $hash = _get_data_hash_from_youtube_video_entry( $entry );
-
-	   #say Dumper ( $hash );
-
-	   _get_video_record( $hash );
+	   
         }
 
         $start_index += $max_results;
@@ -355,6 +351,31 @@ sub get_book_db_record
     return $results->hash;
 }
 
+sub process_raw_xml
+{
+    my $db = _get_db();
+
+    my $youtube_videos_raw_xml = $db->query( " select * from youtube_videos_raw_xml " )->hashes();
+
+    my $stories_processed = 0;
+    my $total_stories   = scalar ( @$youtube_videos_raw_xml );
+
+    foreach my $youtube_video_raw_xml ( @$youtube_videos_raw_xml )
+    {
+        my $full_xml_string = $youtube_video_raw_xml->{ full_xml_string };
+	
+	my $dom = XML::LibXML->load_xml( string => $full_xml_string );
+
+	my $entry = $dom->documentElement();
+
+	my $hash = _get_data_hash_from_youtube_video_entry( $entry );
+
+	#say Dumper ( $hash );
+
+	_get_video_record( $hash );
+    }
+}
+
 sub main
 {
     my $author = $ARGV[ 0 ];
@@ -371,6 +392,8 @@ sub main
     #look_up_at_google_talks(' ' );
     #look_up_ted_talk_author();
     look_up_berkman();
+
+    process_raw_xml();
 
     #look_up_BookTV();
 }
