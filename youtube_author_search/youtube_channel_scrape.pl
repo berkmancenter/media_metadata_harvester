@@ -327,45 +327,6 @@ sub get_book_db_record
     return $results->hash;
 }
 
-sub store_book_videos
-{
-    my ( $book_rec, $video_entries ) = @_;
-
-    say STDERR "store_book_videos";
-
-    foreach my $video_entry ( @$video_entries )
-    {
-
-        say STDERR "Processing video entry ";
-        my $hash = _get_data_hash_from_youtube_video_entry( $video_entry );
-
-        #say Dumper ( $hash );
-
-        _get_video_record( $hash );
-    }
-}
-
-sub look_up_book_videos
-{
-    my ( $title, $author ) = @_;
-
-    say STDERR "look_up_book_videos";
-
-    #exit;
-    my $book_rec = get_book_db_record( $title, $author );
-
-    my $videos = look_up_ted_talk_author( $author );
-
-    say STDERR "Videos storage ";
-    store_book_videos( $book_rec, $videos );
-
-    say STDERR "Done video storage ";
-
-    say STDERR "exiting look_up_book_videos";
-
-    exit;
-}
-
 sub main
 {
     my $author = $ARGV[ 0 ];
@@ -384,87 +345,6 @@ sub main
     look_up_berkman();
 
     look_up_BookTV();
-
-    exit;
-
-
-    while ( my $line = <> )
-    {
-        my ( $title, $author_field ) = split "\t", $line;
-
-        #say "Title: '$title' Author: '$author_field'";
-
-        $lines++;
-
-        next if ( !$author_field );
-
-        chop( $author_field );
-
-        my ( $author_last_name, $author_first_name, $author_life_time ) = split /,\s*/, $author_field;
-
-        $author_first_name //= '';
-        $author_first_name =~ s/\(.*\)//;
-
-        if ( defined( $author_life_time ) )
-        {
-            my ( $birth_year, $death_year ) = split '-', $author_life_time;
-            if ( defined( $death_year ) )
-            {
-
-                #say "Death author: $author_field";
-                $dead_authors++;
-                next;
-            }
-        }
-
-        $living_authors++;
-
-        #say "Living author: $author_field";
-
-        #last if $lines >= 10;
-
-        #next;
-
-        my $author = "$author_first_name $author_last_name";
-
-        #say "'$author'";
-
-
-        look_up_book_videos( $title, $author );
-
-        next;
-
-        my $has_talk = look_up_ted_talk_author( $author );
-
-        if ( $has_talk )
-        {
-            $authors_found++;
-            say "Found talk for author: $author\n";
-        }
-        else
-        {
-            $authors_not_found++;
-        }
-    }
-
-    my $channels = [ keys %{ $channel_author_counts } ];
-
-    $channels = [ sort { $channel_author_counts->{ $a } <=> $channel_author_counts->{ $b } } @{ $channels } ];
-
-    $channels = [ reverse @$channels ];
-
-    foreach my $channel ( @{ $channels } )
-    {
-        say "$channel - $channel_author_counts->{ $channel } ";
-    }
-
-    say "Records: $lines";
-    say "dead authors: $dead_authors";
-    say "living authors: $living_authors";
-    say "Found $authors_found";
-    say "Couldn't find $authors_not_found";
-
-    #$author = 'Nathan Myhrvold';
 }
 
 main();
