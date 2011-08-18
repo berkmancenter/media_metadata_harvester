@@ -261,6 +261,26 @@ sub _youtube_lookup
         foreach my $entry ( @entries )
         {
 
+
+	    {
+	      my  $full_xml_string = $entry->toStringC14N();
+
+	      $xc->setContextNode( $entry );
+	      $xc->registerNs( 'a', 'http://www.w3.org/2005/Atom' );
+
+	      #say Dumper($entry->toHash( 1) );
+
+	      my $id = _get_text_value_of_xpath_query( $xc, './/a:id' );
+
+	      my $db = _get_db();
+
+	      my $raw_xml_hash = { id => $id, full_xml_string => $full_xml_string };
+
+	      $db->query(" DELETE FROM youtube_videos_raw_xml where id = ? ", $id);
+	      $db->insert( 'youtube_videos_raw_xml', $raw_xml_hash );
+	      next; 
+	    }
+
             my $hash = _get_data_hash_from_youtube_video_entry( $entry );
 
             #say Dumper ( $hash );
