@@ -112,6 +112,7 @@ sub _get_data_hash_from_youtube_video_entry
 
     my $rating_numRaters     = _get_attribute_value_of_xpath_query_if_exists( $xc, './gd:rating', 'numRaters' );
 
+    my $media_player_url = _get_attribute_value_of_xpath_query_if_exists( $xc, './media:group/media:player', 'url' );
     #say "id------------------------";
 
     #say $id;
@@ -124,6 +125,7 @@ sub _get_data_hash_from_youtube_video_entry
 	channel     => $channel,
 	duration_seconds   => $duration_seconds,
         keywords        => $media_keywords,
+        media_player_url => $media_player_url,
 	rating_average => $rating_average,
 	rating_max => $rating_max,
 	rating_min => $rating_min,
@@ -150,14 +152,27 @@ sub _get_db
     return $dbh;
 }
 
+my $_db;
 
-sub _store_video_in_db
+sub get_db
+{
+
+  if ( ! defined( $_db ) )
+  {
+     $_db = _get_db();
+  }
+
+  return $_db;
+}
+
+sub store_video_in_db
 {
     my ( $hash ) = @_;
 
     #say "storing video in the db";
-    my $dbh = _get_db();
+    my $dbh = get_db();
 
+    $dbh->query( ' DELETE FROM youtube_videos where id = ? ' , $hash->{ id } );
     $dbh->insert( 'youtube_videos', $hash );
 }
 
@@ -165,7 +180,7 @@ sub _get_video_record
 {
     my ( $hash ) = @_;
 
-    my $dbh = _get_db();
+    my $dbh = get_db();
 
     #say "_get_video_record: id: " . $hash->{ id };
 
@@ -196,7 +211,7 @@ sub store_raw_xml_for_video
     
     my $id = _get_text_value_of_xpath_query( $xc, './/a:id' );
     
-    my $db = _get_db();
+    my $db = get_db();
     
     my $raw_xml_hash = { id => $id, full_xml_string => $full_xml_string };
     
