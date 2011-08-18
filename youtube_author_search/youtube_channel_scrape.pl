@@ -28,6 +28,7 @@ use 5.10.0;
 
 use strict;
 use warnings;
+use Readonly;
 
 sub look_up_youtube_author_talk
 {
@@ -62,16 +63,19 @@ sub _youtube_lookup
 
     my $start_index = 1;
 
-    my $max_results = 50;
-
     my $num_results;
 
     do
     {
 
+        # Max result param for the Youtube api request
+        Readonly my $max_results => 50;
+
         say "Requesting'$base_url' : start_index: $start_index max-results: $max_results";
 
         $uri->query_form( { 'start-index' => $start_index, 'max-results' => $max_results, prettyprint => 'true' } );
+
+	say STDERR "requesting full url: " . $uri;
 
         # Create a request
         my $req = HTTP::Request->new( GET => $uri );
@@ -148,56 +152,6 @@ sub look_up_at_google_talks
     return look_up_youtube_author_talk( $author, 'AtGoogleTalks' );
 }
 
-sub get_book_db_record
-{
-    my ( $title, $author ) = @_;
-
-    my $dbh = _get_db();
-
-    my $results = $dbh->query( " SELECT * from books where author = ? and title = ?  limit 1", $author, $title );
-
-    #say Dumper ( $results );
-
-    my $ret = $results->hashes;
-
-    #say Dumper( $ret );
-
-    #say Dumper( scalar( @$ret ) );
-
-    if ( !scalar( @$ret ) )
-    {
-        $dbh->query( "INSERT INTO books (author, title) VALUES (?, ? ) ", $author, $title );
-        $results = $dbh->query( " SELECT * from books where author = ? and title = ?  limit 1", $author, $title );
-    }
-
-    return $results->hash;
-}
-
-sub process_raw_xml
-{
-    my $db = youtube_utils::_get_db();
-
-    my $youtube_videos_raw_xml = $db->query( " select * from youtube_videos_raw_xml " )->hashes();
-
-    my $stories_processed = 0;
-    my $total_stories   = scalar ( @$youtube_videos_raw_xml );
-
-    foreach my $youtube_video_raw_xml ( @$youtube_videos_raw_xml )
-    {
-        my $full_xml_string = $youtube_video_raw_xml->{ full_xml_string };
-	
-	my $dom = XML::LibXML->load_xml( string => $full_xml_string );
-
-	my $entry = $dom->documentElement();
-
-	my $hash = youtube_utils::_get_data_hash_from_youtube_video_entry( $entry );
-
-	#say Dumper ( $hash );
-
-	 youtube_utils::_get_video_record( $hash );
-    }
-}
-
 sub main
 {
     my $author = $ARGV[ 0 ];
@@ -210,14 +164,11 @@ sub main
     my $dead_authors = 0;
     my $living_authors;
 
-
-    #look_up_at_google_talks(' ' );
-    #look_up_ted_talk_author();
+    look_up_at_google_talks(' ' );
+    look_up_ted_talk_author();
     look_up_berkman();
 
-    process_raw_xml();
-
-    #look_up_BookTV();
+    look_up_BookTV();
 }
 
 main();
