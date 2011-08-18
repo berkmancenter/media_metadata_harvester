@@ -82,6 +82,13 @@ sub get_hash_from_string
           correction.correctionTitle
           correction.correctionText
           correction.correctionDate
+          bookEdition.isbn
+          bookEdition.book.title
+          bookEdition.publisher
+          bookEdition.format
+          bookEdition.pubDate
+          bookEdition.pagination
+          bookEdition.listPrice
 	  text
           )
     ];
@@ -183,7 +190,16 @@ sub _get_element_values_as_hash
 
         $element_name =~ s/\//_/g;
         $ret->{ $element_name } = $value;
+
+	# if ( $element_name =~ /isbn/ )
+	# {
+	#   say STDERR Dumper( $query );
+	#   say STDERR Dumper( $element_name );
+	#   say STDERR Dumper( $value );
+	# }
     }
+
+    #say STDERR Dumper( $ret );
 
     return $ret;
 }
