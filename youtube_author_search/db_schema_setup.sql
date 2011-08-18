@@ -1,3 +1,11 @@
+CREATE TABLE youtube_videos_raw_xml
+(
+	youtube_videos_raw_xml_id INTEGER primary key AUTOINCREMENT,
+	id  text not null,
+	full_xml_string text not null
+)
+;
+
 
 CREATE TABLE youtube_videos
 (
