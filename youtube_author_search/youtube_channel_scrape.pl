@@ -261,35 +261,43 @@ sub _youtube_lookup
         foreach my $entry ( @entries )
         {
 
+	   store_raw_xml_for_video( $entry );
 
-	    {
-	      my  $full_xml_string = $entry->toStringC14N();
+	   next;
 
-	      $xc->setContextNode( $entry );
-	      $xc->registerNs( 'a', 'http://www.w3.org/2005/Atom' );
+	   my $hash = _get_data_hash_from_youtube_video_entry( $entry );
 
-	      #say Dumper($entry->toHash( 1) );
+	   #say Dumper ( $hash );
 
-	      my $id = _get_text_value_of_xpath_query( $xc, './/a:id' );
-
-	      my $db = _get_db();
-
-	      my $raw_xml_hash = { id => $id, full_xml_string => $full_xml_string };
-
-	      $db->query(" DELETE FROM youtube_videos_raw_xml where id = ? ", $id);
-	      $db->insert( 'youtube_videos_raw_xml', $raw_xml_hash );
-	      next; 
-	    }
-
-            my $hash = _get_data_hash_from_youtube_video_entry( $entry );
-
-            #say Dumper ( $hash );
-
-            _get_video_record( $hash );
+	   _get_video_record( $hash );
         }
 
         $start_index += $max_results;
     } while ( $start_index <= $num_results );
+
+    return;
+}
+
+sub store_raw_xml_for_video
+{
+    my ( $entry ) = @_;
+
+    my $xc = XML::LibXML::XPathContext->new( $entry );
+    my  $full_xml_string = $entry->toStringC14N();
+    
+    $xc->setContextNode( $entry );
+    $xc->registerNs( 'a', 'http://www.w3.org/2005/Atom' );
+    
+    #say Dumper($entry->toHash( 1) );
+    
+    my $id = _get_text_value_of_xpath_query( $xc, './/a:id' );
+    
+    my $db = _get_db();
+    
+    my $raw_xml_hash = { id => $id, full_xml_string => $full_xml_string };
+    
+    $db->query(" DELETE FROM youtube_videos_raw_xml where id = ? ", $id);
+    $db->insert( 'youtube_videos_raw_xml', $raw_xml_hash );
 
     return;
 }
@@ -360,11 +368,11 @@ sub main
     my $living_authors;
 
 
-    look_up_at_google_talks(' ' );
-    look_up_ted_talk_author();
+    #look_up_at_google_talks(' ' );
+    #look_up_ted_talk_author();
     look_up_berkman();
 
-    look_up_BookTV();
+    #look_up_BookTV();
 }
 
 main();
