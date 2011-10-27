@@ -6,6 +6,7 @@ use Encode;
 use LWP::UserAgent;
 use XML::LibXML;
 use Carp;
+use Class::CSV;
 
 #use XML::LibXML::Enhanced;
 
@@ -187,7 +188,7 @@ sub _get_npr_api_url
     return;
 }
 
-my $npr_ids_to_scrap = [
+my $npr_ids_already_scrapped = [
 
     #topics
     '1034',    # (1) Book Reviews
@@ -216,9 +217,36 @@ sub main
 {
     Readonly my $api_key => "MDAzNzI2MDAxMDEyNDczMjQ5OTUwODhmZA001";
 
-    foreach my $npr_id ( @{ $npr_ids_to_scrap } )
+    my $fields = [ 'TITLE', 'ID',  'Additional Info' ];
+
+    my $csv = Class::CSV->parse(
+        filename => 'npr_topics_all.csv',
+        fields   => $fields,
+    );
+
+    my $id_lines_scrapped = 0;
+
+    shift @ { $csv->lines };
+
+    foreach my $line ( @{ $csv->lines } )
     {
+
+        my $npr_id = $line->{ ID };
+
+        if ( any { $_ eq $npr_id } @ {$npr_ids_already_scrapped  } )
+	{
+	   say "skipping already scrapped id: $npr_id";
+	   next;
+	}
+
+        say "Scrapping line " . ($id_lines_scrapped + 1) . " of " . scalar( @{ $csv->lines } );
+	say $line->{ TITLE } . ' ' . $line->{ ID };
+
+
         _get_npr_api_url( $npr_id, $api_key );
+
+	$id_lines_scrapped++;
+	#exit;
     }
 }
 

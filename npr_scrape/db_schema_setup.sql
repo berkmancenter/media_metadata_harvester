@@ -8,7 +8,7 @@ CREATE TABLE npr_items_raw
 CREATE TABLE npr_items_processed
 (
 	npr_item_id INTEGER primary key AUTOINCREMENT,
-	id  text not null,
+	id  text UNIQUE not null,
 audio_description text ,
 audio_duration text ,
 audio_format_mp3 text ,
